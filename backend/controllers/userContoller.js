@@ -1,4 +1,11 @@
 import User from "../models/User.js";
+import jwt from "jsonwebtoken";
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 
 const registerUser = async (req, res) => {
   try {
@@ -44,6 +51,7 @@ const loginUser = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
+    const token = generateToken(user._id);
 
     const userResponse = user.toObject();
     delete userResponse.passwordHash;
@@ -51,6 +59,7 @@ const loginUser = async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       user: userResponse,
+      token,
     });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
