@@ -5,6 +5,7 @@ import userRoutes from "./routes/userRoutes.js";
 import laptopRoutes from "./routes/laptopRoutes.js";
 import rentalRoutes from "./routes/rentalRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/laptops", laptopRoutes);
 app.use("/api/rentals", rentalRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

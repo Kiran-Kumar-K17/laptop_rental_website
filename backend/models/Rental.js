@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const rentSchema = new Schema(
   {
-    useId: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,

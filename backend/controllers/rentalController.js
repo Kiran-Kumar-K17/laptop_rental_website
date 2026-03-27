@@ -37,7 +37,7 @@ const createRental = async (req, res) => {
 
     // 3. Create Rental Record
     const rental = await Rental.create({
-      useId: req.user._id,
+      userId: req.user._id,
       laptopId,
       rentedFrom,
       rentedTo,
@@ -65,7 +65,7 @@ const createRental = async (req, res) => {
 
 const getUserRentals = async (req, res) => {
   try {
-    const rentals = await Rental.find({ useId: req.user._id })
+    const rentals = await Rental.find({ userId: req.user._id })
       .populate("laptopId", "brand model pricing")
       .sort("-createdAt");
     res.status(200).json(rentals);
@@ -115,7 +115,7 @@ const cancelRental = async (req, res) => {
   try {
     const rental = await Rental.findOne({
       _id: req.params.id,
-      useId: req.user._id,
+      userId: req.user._id,
     });
 
     if (!rental || rental.status !== "pending") {
