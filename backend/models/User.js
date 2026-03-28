@@ -23,7 +23,6 @@ const userSchema = new Schema(
     passwordHash: {
       type: String,
       required: true,
-      trim: true,
     },
     role: {
       type: String,

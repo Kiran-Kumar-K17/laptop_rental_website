@@ -94,13 +94,10 @@ const updateProfile = async (req, res) => {
     if (name) updateData.name = name;
     if (email) updateData.email = email;
     if (phone) updateData.phone = phone;
-    if (street || city || state || pincode) {
-      updateData.address = {};
-      if (street) updateData.address.street = street;
-      if (city) updateData.address.city = city;
-      if (state) updateData.address.state = state;
-      if (pincode) updateData.address.pincode = pincode;
-    }
+    if (street) updateData["address.street"] = street;
+    if (city) updateData["address.city"] = city;
+    if (state) updateData["address.state"] = state;
+    if (pincode) updateData["address.pincode"] = pincode;
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ error: "No data to update" });
@@ -108,7 +105,7 @@ const updateProfile = async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
       new: true,
-      runValidation: true,
+      runValidators: true,
     });
 
     if (!updatedUser) {

@@ -15,7 +15,35 @@ const createRental = async (req, res) => {
       deliveryAddress,
     } = req.body;
 
-    // 1. Verify User KYC Status
+    // 1. Fetch Laptop to get total capacity
+    const laptop = await Laptop.findById(laptopId);
+    if (!laptop || laptop.status === "maintenance") {
+      return res
+        .status(404)
+        .json({ error: "Laptop unavailable or not found." });
+    }
+
+    // 2. Advanced Overlap Check: Count active rentals during this period
+    const start = new Date(rentedFrom);
+    const end = new Date(rentedTo);
+
+    const activeRentalsCount = await Rental.countDocuments({
+      laptopId,
+      status: { $in: ["pending", "active"] },
+      $or: [
+        { rentedFrom: { $lte: end, $gte: start } }, // Starts during requested range
+        { rentedTo: { $gte: start, $lte: end } }, // Ends during requested range
+        { rentedFrom: { $lte: start }, rentedTo: { $gte: end } }, // Spans across entire range
+      ],
+    });
+
+    if (activeRentalsCount >= laptop.totalUnits) {
+      return res.status(400).json({
+        error: `Sorry, all ${laptop.totalUnits} units are fully booked for these dates.`,
+      });
+    }
+
+    // 3. Verify User KYC Status (as per your existing model)
     const user = await User.findById(req.user._id);
     if (!user.kycVerified) {
       return res
@@ -23,38 +51,24 @@ const createRental = async (req, res) => {
         .json({ error: "KYC verification required before renting." });
     }
 
-    // 2. Check Laptop Availability
-    const laptop = await Laptop.findById(laptopId);
-    if (
-      !laptop ||
-      laptop.availableUnits <= 0 ||
-      laptop.status !== "available"
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Laptop is currently unavailable." });
-    }
-
-    // 3. Create Rental Record
+    // 4. Create Rental Record
     const rental = await Rental.create({
       userId: req.user._id,
       laptopId,
-      rentedFrom,
-      rentedTo,
+      rentedFrom: start,
+      rentedTo: end,
       totalDays,
       deliveryType,
       deliveryAddress:
         deliveryType === "delivery" ? deliveryAddress : undefined,
-      pricing: {
-        baseAmount,
-        totalAmount,
-      },
+      pricing: { baseAmount, totalAmount },
       securityDeposit: laptop.securityDeposit,
     });
 
-    // 4. Update Laptop Inventory
+    // 5. Update Live Inventory
+    // Note: availableUnits now represents "Current Instant Availability"
     laptop.availableUnits -= 1;
-    if (laptop.availableUnits === 0) laptop.status = "rented";
+    if (laptop.availableUnits <= 0) laptop.status = "rented";
     await laptop.save();
 
     res.status(201).json(rental);
@@ -136,4 +150,23 @@ const cancelRental = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-export { createRental, getUserRentals, returnLaptop, cancelRental };
+
+const getRentalById = async (req, res) => {
+  try {
+    const rental = await Rental.findById(req.params.id)
+      .populate("laptopId", "brand model pricing")
+      .populate("userId", "name email");
+    if (!rental) return res.status(404).json({ error: "Rental not found" });
+    res.status(200).json(rental);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export {
+  createRental,
+  getUserRentals,
+  returnLaptop,
+  cancelRental,
+  getRentalById,
+};

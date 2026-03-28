@@ -53,12 +53,46 @@ const addLaptop = async (req, res) => {
 
 const updateLaptop = async (req, res) => {
   try {
-    const laptop = await Laptop.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const { totalUnits } = req.body;
+    const laptop = await Laptop.findById(req.params.id);
+
     if (!laptop) return res.status(404).json({ error: "Laptop not found" });
-    res.status(200).json(laptop);
+
+    // 1. If totalUnits is being updated, sync availableUnits
+    if (totalUnits !== undefined) {
+      const unitDifference = totalUnits - laptop.totalUnits;
+
+      // Calculate new availability
+      const newAvailableUnits = laptop.availableUnits + unitDifference;
+
+      // Prevent reducing totalUnits below what is currently rented out
+      if (newAvailableUnits < 0) {
+        return res.status(400).json({
+          error: `Cannot reduce total units to ${totalUnits}. ${Math.abs(laptop.availableUnits - laptop.totalUnits)} units are currently rented out.`,
+        });
+      }
+
+      req.body.availableUnits = newAvailableUnits;
+
+      // Update status if units become available or sold out
+      if (newAvailableUnits > 0 && laptop.status === "rented") {
+        req.body.status = "available";
+      } else if (newAvailableUnits === 0) {
+        req.body.status = "rented";
+      }
+    }
+
+    // 2. Perform the update
+    const updatedLaptop = await Laptop.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    res.status(200).json(updatedLaptop);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
