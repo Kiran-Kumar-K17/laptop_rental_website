@@ -26,27 +26,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
 
-// --- Fix for __dirname in ES Modules ------------------------------------------
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-// ------------------------------------------------------------------------------
-
-// ---------------------------------------Serve static files and HTML pages from the "views" directory---------------------------------------
-app.use(express.static(path.join(__dirname, "views")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "HomePage.html"));
-});
-
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "Login.html"));
-});
-
-app.get("/signup", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "SignUp.html"));
-});
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 app.use("/api/users", userRoutes);
 app.use("/api/laptops", laptopRoutes);
 app.use("/api/rentals", rentalRoutes);
