@@ -5,7 +5,7 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import Profile from "./pages/user/Profile";
 import UploadKYC from "./pages/user/UploadKYC";
-import AdminPage from "./pages/admin/AdminPage"; // ✅ IMPORTANT
+import AdminPage from "./pages/admin/AdminPage";
 import Checkout from "./pages/rental/CheckOut";
 import RentalSuccess from "./pages/rental/RentalSuccess";
 import MyBooking from "./pages/user/MyBooking";
