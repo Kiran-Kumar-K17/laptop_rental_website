@@ -4,7 +4,7 @@ import "../../pages/admin/KYC.css";
 const UserCard = ({ user }) => {
   const [showModal, setShowModal] = useState(false);
 
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
   const docUrl = user.kycDocument
     ? `${BASE_URL}/${user.kycDocument.replace(/\\/g, "/")}`
