@@ -5,7 +5,7 @@ import "./LaptopCard.css";
 const LaptopCard = ({ laptops = [] }) => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
-  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
+  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
   const scroll = (dir) => {
     if (!scrollRef.current) return;
