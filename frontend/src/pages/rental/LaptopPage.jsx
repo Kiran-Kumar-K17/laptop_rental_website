@@ -18,7 +18,7 @@ const LaptopPage = () => {
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
-  const baseURL = "http://localhost:8000/";
+  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
 
   const fetchLaptops = async () => {
     try {
