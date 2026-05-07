@@ -79,11 +79,10 @@
 }
 
 /* ===== FOOTER ===== */
-.authPage-form p {
+.authPage-form p:not(.error) {
   text-align: center;
   color: #6b7280;
 }
-
 .authPage-form a {
   color: #0e3386;
   text-decoration: none;
@@ -99,4 +98,14 @@
   .authPage-container {
     padding: 16px;
   }
+}
+.input-error {
+  border: 1px solid red !important;
+  background: #fff0f0;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: -8px;
 }

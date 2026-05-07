@@ -20,9 +20,17 @@ const registerUser = async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ error: "Email already registered" });
+      return res
+        .status(400)
+        .json({ message: "Email already exists", field: "email" });
     }
-
+    const existingPhone = await User.findOne({ phone });
+    if (existingPhone) {
+      return res.status(400).json({
+        message: "Phone Number already exists",
+        field: "phone",
+      });
+    }
     const user = await User.create({
       name,
       email,
@@ -36,6 +44,14 @@ const registerUser = async (req, res) => {
 
     res.status(201).json(userResponse);
   } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+
+      return res.status(400).json({
+        message: `${field} already exists`,
+        field,
+      });
+    }
     res.status(400).json({ error: error.message });
   }
 };
