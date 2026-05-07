@@ -117,7 +117,7 @@ const MyBooking = () => {
                 {/* IMAGE */}
                 <div className="bookingCardImage">
                   <img
-                    src={`http://localhost:8000/${laptop?.images?.[0]}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}/${laptop.images?.[0] || ""}`}
                     alt="laptop"
                   />
                 </div>
