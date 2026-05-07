@@ -15,7 +15,7 @@ const HeroBanner = () => {
   const [laptop, setLaptop] = useState(null);
   const [quoteIndex, setQuoteIndex] = useState(0);
 
-  const baseURL = "http://localhost:8000/";
+  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
 
   // 🔥 Fetch featured laptop
   useEffect(() => {
