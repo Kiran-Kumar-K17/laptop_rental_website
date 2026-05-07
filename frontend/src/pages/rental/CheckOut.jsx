@@ -5,7 +5,7 @@ import API from "../../api/axios.js";
 import KYCModal from "../../components/kyc/KYCModal";
 
 const Checkout = () => {
-  const baseURL = import.meta.env.VITE_BACKEND_ENDPOINT || "http://localhost:8000/";
+  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
   const location = useLocation();
   const navigate = useNavigate();
   const { laptop } = location.state || {};
