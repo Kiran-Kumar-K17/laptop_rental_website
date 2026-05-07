@@ -8,7 +8,7 @@ const Laptops = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
-  const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
 
   const fetchLaptops = async () => {
     try {
@@ -64,7 +64,7 @@ const Laptops = () => {
                 <img
                   src={
                     lap.images?.[0]
-                      ? `${BASE_URL}/${lap.images[0]}`
+                      ? `${BASE_URL}${lap.images[0]}`
                       : "/no-image.png"
                   }
                   alt={lap.model}
