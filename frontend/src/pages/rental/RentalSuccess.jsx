@@ -5,7 +5,7 @@ import "./RentalSuccess.css";
 
 const RentalSuccess = () => {
   const { id } = useParams();
-  const baseURL = "http://localhost:8000/";
+  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
 
   const [rental, setRental] = useState(null);
   const [loading, setLoading] = useState(true);
