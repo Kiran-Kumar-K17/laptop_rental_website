@@ -60,7 +60,7 @@ const LaptopDetails = () => {
         <div>
           <div className="laptopImageSection laptopDetailsCard">
             <img
-             src={`${import.meta.env.VITE_BACKEND_END_URL || "http://localhost:8000"}/${laptop.images?.[0] || ""}`}
+             src={`${import.meta.env.VITE_BACKEND_URL || "http://localhost:8000"}/${laptop.images?.[0] || ""}`}
               alt={laptop.model}
             />
           </div>
