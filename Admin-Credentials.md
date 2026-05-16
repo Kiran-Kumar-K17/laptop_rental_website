@@ -1,2 +1,2 @@
-Email: kdelta185@gmail.com
+Email: admin@gmail.com
 Password: 123456789
