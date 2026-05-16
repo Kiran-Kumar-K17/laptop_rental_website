@@ -13,9 +13,7 @@ backend/
  └── database-data/
      ├── users.json
      ├── laptops.json
-     ├── rentals.json
-     ├── payments.json
-     ├── reviews.json
+
 ```
 
 ---
@@ -40,7 +38,7 @@ backend/
 5. Select file:
 
    ```
-   backup-database/users.json
+   backend/backup-database/users.json
    ```
 
 6. Choose format:
@@ -55,13 +53,10 @@ backend/
 
 ### 🔁 Repeat for all files:
 
-| File          | Collection |
-| ------------- | ---------- |
-| users.json    | users      |
-| laptops.json  | laptops    |
-| rentals.json  | rentals    |
-| payments.json | payments   |
-| reviews.json  | reviews    |
+| File         | Collection |
+| ------------ | ---------- |
+| users.json   | users      |
+| laptops.json | laptops    |
 
 ---
 

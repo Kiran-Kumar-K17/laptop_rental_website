@@ -1,0 +1,20 @@
+{
+  "_id": { "$oid": "6a088ae69dd80e687050c8fe" },
+  "name": "Admin",
+  "email": "admin@gmail.com",
+  "phone": "1111111111",
+  "passwordHash": "$2b$10$6svtDjJ6JccNNHGOljtDq.pjdCYTHoQwoYxTa5xhJFI7Y9Newkmo.",
+  "role": "admin",
+  "kycVerified": true,
+  "kycStatus": "approved",
+  "kycDocument": null,
+  "address": {
+    "street": "Udupi",
+    "city": "Udupi",
+    "state": "Karnataka",
+    "pincode": "576101"
+  },
+  "createdAt": { "$date": "2026-04-24T06:05:07.542Z" },
+  "updatedAt": { "$date": "2026-04-24T06:05:07.542Z" },
+  "__v": 0
+}
