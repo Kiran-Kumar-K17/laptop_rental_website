@@ -10,8 +10,8 @@ const Footer = () => {
         <div className="footer-section">
           <h2>LaptopRent</h2>
           <p>
-            Rent high-performance laptops at affordable prices.
-            Built for students, developers, and professionals.
+            Rent high-performance laptops at affordable prices. Built for
+            students, developers, and professionals.
           </p>
         </div>
 
@@ -19,7 +19,7 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Contact</h4>
           <p>
-            <FaEnvelope /> support@laptoprent.com
+            <FaEnvelope /> rent.byte.0@gmail.com
           </p>
           <p>
             <FaMapMarkerAlt /> India

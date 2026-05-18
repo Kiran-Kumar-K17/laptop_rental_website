@@ -1,8 +1,9 @@
+import dotenv from "dotenv";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import Payment from "../models/Payment.js";
 import Rental from "../models/Rental.js";
-import dotenv from "dotenv";
+
 dotenv.config();
 
 const razorpay = new Razorpay({
