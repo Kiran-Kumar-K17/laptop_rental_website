@@ -215,16 +215,6 @@ Contributions are welcome! Please follow these steps:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
-
-For support, email support@laptoprental.com or open an issue in the repository.
-
-## 🔗 Links
-
-- [Live Demo](#) - Link to deployed application
-- [API Documentation](#) - Detailed API docs
-- [Issue Tracker](https://github.com/Kiran-Kumar-K17/laptop_rental_website/issues)
-
 ## 🙏 Acknowledgments
 
 - Razorpay for payment processing
