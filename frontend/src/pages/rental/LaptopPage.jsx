@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../api/axios";
 import "./LaptopPage.css";
 import { useNavigate } from "react-router-dom";
+import { backendURL } from "../../api/axios.js";
 
 const LaptopPage = () => {
   const [laptops, setLaptops] = useState([]);
@@ -18,7 +19,7 @@ const LaptopPage = () => {
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
+  const baseURL = backendURL;
 
   const fetchLaptops = async () => {
     try {
@@ -110,18 +111,16 @@ const LaptopPage = () => {
               className="laptop-card"
               onClick={() => navigate(`/laptops/details/${lap._id}`)}
             >
-              <img src={`${baseURL}${lap.images?.[0]}`} alt={lap.model} />
+              <img src={`${baseURL}/${lap.images?.[0]}`} alt={lap.model} />
 
               <div className="card-body">
-                <h3>{lap.brand} {lap.model}</h3>
+                <h3>
+                  {lap.brand} {lap.model}
+                </h3>
                 <p className="cpu">{lap.specs?.processor}</p>
 
                 <div className="bottom">
-                  <span className="price">
-                    ₹{lap.pricing?.perDay} /day
-                  </span>
-
-                 
+                  <span className="price">₹{lap.pricing?.perDay} /day</span>
                 </div>
               </div>
             </div>

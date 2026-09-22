@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import "./HeroBanner.css";
+import { backendURL } from "../../api/axios.js";
 
 const quotes = [
   "Power your ideas with the right machine.",
@@ -15,7 +16,7 @@ const HeroBanner = () => {
   const [laptop, setLaptop] = useState(null);
   const [quoteIndex, setQuoteIndex] = useState(0);
 
-  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
+  const baseURL = backendURL;
 
   // 🔥 Fetch featured laptop
   useEffect(() => {
@@ -85,7 +86,7 @@ const HeroBanner = () => {
 
         {/* RIGHT SIDE */}
         <div className="hero-image">
-          <img src={`${baseURL}${laptop.images?.[0]}`} alt={laptop.model} />
+          <img src={`${baseURL}/${laptop.images?.[0]}`} alt={laptop.model} />
         </div>
       </div>
     </div>

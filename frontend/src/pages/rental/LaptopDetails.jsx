@@ -12,6 +12,9 @@ import {
   MonitorCog,
 } from "lucide-react";
 import "./LaptopDetails.css";
+import { backendURL } from "../../api/axios.js";
+
+const baseURL = backendURL;
 
 const LaptopDetails = () => {
   const { id } = useParams();
@@ -60,7 +63,7 @@ const LaptopDetails = () => {
         <div>
           <div className="laptopImageSection laptopDetailsCard">
             <img
-             src={`${import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/"}${laptop.images?.[0] || ""}`}
+              src={`${baseURL}/${laptop.images?.[0] || ""}`}
               alt={laptop.model}
             />
           </div>

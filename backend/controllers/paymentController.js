@@ -42,7 +42,12 @@ const createOrder = async (req, res) => {
 
     res.status(200).json(order);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("CREATE ORDER ERROR:", error);
+
+    res.status(500).json({
+      error: error.message,
+      details: error.error?.description || null,
+    });
   }
 };
 

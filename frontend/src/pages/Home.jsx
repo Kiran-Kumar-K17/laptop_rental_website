@@ -4,7 +4,7 @@ import LaptopCard from "../components/home/LaptopCard";
 import API from "../api/axios";
 import "./Home.css";
 import Footer from "../components/home/Footer";
-//home 
+//home
 const Home = () => {
   const [laptops, setLaptops] = useState([]);
 
@@ -44,8 +44,7 @@ const Home = () => {
       </div>
 
       {/* MORE CATEGORIES? */}
-      <Footer/>
-
+      <Footer />
     </div>
   );
 };

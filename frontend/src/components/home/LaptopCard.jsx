@@ -1,11 +1,12 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LaptopCard.css";
+import { backendURL } from "../../api/axios.js";
 
 const LaptopCard = ({ laptops = [] }) => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
-  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const baseURL = backendURL;
 
   const scroll = (dir) => {
     if (!scrollRef.current) return;
@@ -38,7 +39,7 @@ const LaptopCard = ({ laptops = [] }) => {
             onClick={() => handleDetails(lap)} // ✅ FULL CARD CLICK
           >
             <img
-              src={`${baseURL}${lap.images?.[0]}`}
+              src={`${baseURL}/${lap.images?.[0]}`}
               alt={lap.model}
               className="card-img"
             />
@@ -56,7 +57,9 @@ const LaptopCard = ({ laptops = [] }) => {
               <div className="card-bottom">
                 <span className="price">₹{lap.pricing?.perDay}</span>
 
-                <button className ="butt" onClick={(e) => goToCheckout(lap, e)}>Rent</button>
+                <button className="butt" onClick={(e) => goToCheckout(lap, e)}>
+                  Rent
+                </button>
               </div>
             </div>
           </div>

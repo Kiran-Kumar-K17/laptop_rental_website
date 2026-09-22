@@ -3,9 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./CheckOut.css";
 import API from "../../api/axios.js";
 import KYCModal from "../../components/kyc/KYCModal";
+import { backendURL } from "../../api/axios.js";
 
 const Checkout = () => {
-  const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
+  const baseURL = backendURL;
   const location = useLocation();
   const navigate = useNavigate();
   const { laptop } = location.state || {};
@@ -115,7 +116,7 @@ const Checkout = () => {
           {/* PRODUCT CARD */}
           <div className="checkoutCard checkoutProductCard">
             <img
-              src={`${baseURL}${laptop.images?.[0]}`}
+              src={`${baseURL}/${laptop.images?.[0]}`}
               alt={laptop.model}
               className="checkoutProductImg"
             />

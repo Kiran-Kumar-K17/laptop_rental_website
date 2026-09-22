@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import API from "../../api/axios";
 import "./Laptops.css";
 import LaptopForm from "../../components/forms/LaptopForm";
+import { backendURL } from "../../api/axios.js";
 
 const Laptops = () => {
   const [laptops, setLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
-  const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
+  const baseURL = backendURL;
 
   const fetchLaptops = async () => {
     try {
@@ -36,18 +37,13 @@ const Laptops = () => {
 
   return (
     <div className="admin-laptops-page">
-
       {/* HEADER */}
       <div className="laptops-header">
         <div>
           <h2>Laptops</h2>
-          
         </div>
 
-        <button
-          className="add-laptop-btn"
-          onClick={() => setShowForm(true)}
-        >
+        <button className="add-laptop-btn" onClick={() => setShowForm(true)}>
           + Add Laptop
         </button>
       </div>
@@ -59,12 +55,11 @@ const Laptops = () => {
         <div className="laptops-container">
           {laptops.map((lap) => (
             <div className="laptop-card" key={lap._id}>
-              
               <div className="laptop-image">
                 <img
                   src={
                     lap.images?.[0]
-                      ? `${BASE_URL}${lap.images[0]}`
+                      ? `${baseURL}/${lap.images[0]}`
                       : "/no-image.png"
                   }
                   alt={lap.model}
@@ -72,7 +67,6 @@ const Laptops = () => {
               </div>
 
               <div className="laptop-content">
-
                 <div className="laptop-header-card">
                   <h3>{lap.model}</h3>
                   <span className="brand">{lap.brand}</span>
@@ -99,7 +93,6 @@ const Laptops = () => {
                   <span>Status: {lap.status}</span>
                   <span>Available: {lap.availableUnits}</span>
                 </div>
-
               </div>
             </div>
           ))}

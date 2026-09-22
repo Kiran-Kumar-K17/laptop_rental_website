@@ -1,13 +1,13 @@
 import { useState } from "react";
-import API from "../../api/axios";
+import API, { backendURL } from "../../api/axios";
 import "../../pages/admin/KYC.css";
 const UserCard = ({ user }) => {
   const [showModal, setShowModal] = useState(false);
 
-  const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/";
+  const baseURL = backendURL;
 
   const docUrl = user.kycDocument
-    ? `${BASE_URL}${user.kycDocument.replace(/\\/g, "/")}`
+    ? `${baseURL}/${user.kycDocument.replace(/\\/g, "/")}`
     : null;
 
   const handleApprove = async () => {

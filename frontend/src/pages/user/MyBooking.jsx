@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../api/axios";
 import "./MyBooking.css";
 import ReviewModal from "./ReviewModal";
+import { backendURL } from "../../api/axios.js";
 
 const MyBooking = () => {
   const [bookings, setBookings] = useState([]);
@@ -10,6 +11,7 @@ const MyBooking = () => {
   const [comment, setComment] = useState("");
   const [existingReview, setExistingReview] = useState(null);
 
+  const baseURL = backendURL;
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -117,7 +119,7 @@ const MyBooking = () => {
                 {/* IMAGE */}
                 <div className="bookingCardImage">
                   <img
-                   src={`${import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/"}${laptop.images?.[0] || ""}`}
+                    src={`${baseURL}/${laptop.images?.[0] || ""}`}
                     alt="laptop"
                   />
                 </div>
