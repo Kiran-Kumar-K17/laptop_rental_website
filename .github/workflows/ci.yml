@@ -47,3 +47,21 @@ jobs:
             --build-arg VITE_RAZORPAY_KEY=${{ secrets.VITE_RAZORPAY_KEY }} \
             -t laptop-rental-frontend:ci \
             ./frontend
+            
+      - name: Scan backend image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: laptop-rental-backend:ci
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Scan frontend image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: laptop-rental-frontend:ci
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
