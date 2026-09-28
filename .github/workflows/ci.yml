@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_RAZORPAY_KEY: ${{ secrets.VITE_RAZORPAY_KEY }}
+        run: npm run build
+
+      - name: Build backend Docker image
+        run: docker build -t laptop-rental-backend:ci ./backend
+
+      - name: Build frontend Docker image
+        run: |
+          docker build \
+            --build-arg VITE_RAZORPAY_KEY=${{ secrets.VITE_RAZORPAY_KEY }} \
+            -t laptop-rental-frontend:ci \
+            ./frontend

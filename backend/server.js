@@ -32,6 +32,13 @@ app.use("/api/rentals", rentalRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "backend",
+  });
+});
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {
