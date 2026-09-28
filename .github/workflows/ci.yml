@@ -17,44 +17,131 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
+      # Backend
       - name: Install backend dependencies
         working-directory: backend
         run: npm ci
 
+      - name: Inspect backend dependencies
+        working-directory: backend
+        run: |
+          echo "===== Backend dependencies ====="
+          npm ls brace-expansion ip-address pacote picomatch sigstore --all || true
+
+          echo "===== npm explain ====="
+          npm explain brace-expansion || true
+          npm explain ip-address || true
+          npm explain pacote || true
+          npm explain picomatch || true
+          npm explain sigstore || true
+
+      # Frontend
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
 
-      - name: Inspect backend dependencies
-        working-directory: backend
-        run: npm ls brace-expansion ip-address pacote picomatch sigstore || true
-
       - name: Inspect frontend dependencies
         working-directory: frontend
-        run: npm ls brace-expansion ip-address pacote picomatch sigstore || true
+        run: |
+          echo "===== Frontend dependencies ====="
+          npm ls brace-expansion ip-address pacote picomatch sigstore --all || true
+
+          echo "===== npm explain ====="
+          npm explain brace-expansion || true
+          npm explain ip-address || true
+          npm explain pacote || true
+          npm explain picomatch || true
+          npm explain sigstore || true
+
+      # Lockfiles
+      - name: Check vulnerable packages in lockfiles
+        run: |
+          echo "===== Backend lockfile ====="
+          grep -n -E '"(brace-expansion|ip-address|pacote|picomatch|sigstore)"' \
+            backend/package-lock.json || true
+
+          echo "===== Frontend lockfile ====="
+          grep -n -E '"(brace-expansion|ip-address|pacote|picomatch|sigstore)"' \
+            frontend/package-lock.json || true
+
+      # Frontend build
       - name: Build frontend
         working-directory: frontend
         env:
           VITE_RAZORPAY_KEY: ${{ secrets.VITE_RAZORPAY_KEY }}
         run: npm run build
 
+      # Backend Docker image
       - name: Build backend Docker image
-        run: docker build -t laptop-rental-backend:ci ./backend
+        run: |
+          docker build \
+            --no-cache \
+            -t laptop-rental-backend:ci \
+            ./backend
 
+      # Inspect the exact image Trivy scans
+      - name: Inspect backend Docker image
+        run: |
+          docker run --rm laptop-rental-backend:ci sh -c '
+            echo "===== Node ====="
+            node --version
+
+            echo "===== npm ====="
+            npm --version
+
+            echo "===== Installed packages ====="
+            npm ls \
+              brace-expansion \
+              ip-address \
+              pacote \
+              picomatch \
+              sigstore \
+              --all || true
+
+            echo "===== Package files inside image ====="
+
+            for pkg in \
+              brace-expansion \
+              ip-address \
+              pacote \
+              picomatch \
+              sigstore
+            do
+              echo ""
+              echo "========== $pkg =========="
+
+              find / \
+                -path "*/node_modules/$pkg/package.json" \
+                -type f \
+                2>/dev/null |
+              while read f
+              do
+                echo "Path: $f"
+                grep "\"version\"" "$f" | head -1
+              done
+            done
+          '
+
+      # Frontend Docker image
       - name: Build frontend Docker image
         run: |
           docker build \
             --build-arg VITE_RAZORPAY_KEY=${{ secrets.VITE_RAZORPAY_KEY }} \
             -t laptop-rental-frontend:ci \
             ./frontend
-            
+
+      # Security scanning
       - name: Scan backend image
         uses: aquasecurity/trivy-action@master
         with:
