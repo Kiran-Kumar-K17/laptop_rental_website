@@ -6,7 +6,7 @@ RUN apk update && apk upgrade --no-cache
 
 COPY package*.json ./
 
-RUN npm install -g npm@latest && npm ci --omit=dev && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force
 
 COPY . .
 
