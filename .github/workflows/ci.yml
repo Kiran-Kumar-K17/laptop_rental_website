@@ -11,58 +11,63 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_BACKEND_REPOSITORY: laptop-rental-backend
+  ECR_FRONTEND_REPOSITORY: laptop-rental-frontend
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
 
-      # Backend
       - name: Install backend dependencies
         working-directory: backend
         run: npm ci
 
-      # Frontend
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
 
-
-      # Frontend build
       - name: Build frontend
         working-directory: frontend
         env:
           VITE_RAZORPAY_KEY: ${{ secrets.VITE_RAZORPAY_KEY }}
         run: npm run build
 
-      # Backend Docker image
+      # -------------------------
+      # Docker build
+      # -------------------------
+
       - name: Build backend Docker image
         run: |
-          docker build \
-            --no-cache \
+          docker build --pull \
             -t laptop-rental-backend:ci \
             ./backend
 
-      # Frontend Docker image
       - name: Build frontend Docker image
         run: |
-          docker build \
+          docker build --pull\
             --build-arg VITE_RAZORPAY_KEY=${{ secrets.VITE_RAZORPAY_KEY }} \
             -t laptop-rental-frontend:ci \
             ./frontend
 
-      # Security scanning
+      # -------------------------
+      # Security scan
+      # -------------------------
+
       - name: Scan backend image
         uses: aquasecurity/trivy-action@master
         with:
@@ -80,3 +85,73 @@ jobs:
           exit-code: 1
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+
+      # -------------------------
+      # AWS authentication
+      # -------------------------
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # -------------------------
+      # ECR login
+      # -------------------------
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # -------------------------
+      # Tag images
+      # -------------------------
+
+      - name: Tag Docker images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag \
+            laptop-rental-backend:ci \
+            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
+
+          docker tag \
+            laptop-rental-backend:ci \
+            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
+
+          docker tag \
+            laptop-rental-frontend:ci \
+            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
+
+          docker tag \
+            laptop-rental-frontend:ci \
+            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
+
+      # -------------------------
+      # Push to ECR
+      # -------------------------
+
+      - name: Push backend image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push \
+            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
+
+          docker push \
+            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
+
+      - name: Push frontend image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push \
+            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
+
+          docker push \
+            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
+        
