@@ -11,6 +11,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy only necessary folders/files
 COPY config/ ./config/
+COPY uploads/ ./uploads/
 COPY controllers/ ./controllers/
 COPY middleware/ ./middleware/
 COPY models/ ./models/
