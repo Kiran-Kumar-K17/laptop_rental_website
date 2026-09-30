@@ -8,12 +8,8 @@ RUN apk upgrade --no-cache \
 
 COPY package*.json ./
 
-<<<<<<< HEAD
-RUN npm ci --omit=dev && npm cache clean --force
-=======
 RUN npm ci --omit=dev \
     && npm cache clean --force
->>>>>>> 50af983 (Update Node.js version in CI workflow and enhance Dockerfile for better package management)
 
 COPY . .
 
