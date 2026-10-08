@@ -189,17 +189,6 @@ REACT_APP_RAZORPAY_KEY_ID=rzp_live_xxxxx
 4. **Monitor Bookings**: Track all rental activities
 5. **View Analytics**: Check revenue and rental statistics
 
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend
-npm test
-
-# Frontend tests
-cd frontend
-npm test
-```
 
 ## 🤝 Contributing
 

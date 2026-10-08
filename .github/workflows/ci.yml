@@ -5,11 +5,17 @@ on:
     branches:
       - main
       - develop
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
 
   pull_request:
     branches:
       - main
       - develop
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
 
 permissions:
   contents: read
@@ -21,9 +27,33 @@ env:
   ECR_FRONTEND_REPOSITORY: laptop-rental-frontend
 
 jobs:
-  build:
+  changes:
     runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      - name: Check for file changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - backend/**
+            frontend:
+              - frontend/**
+    
+    # -------------------------
+    # Backend build
+    # -------------------------
+    
+  backend:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,36 +67,9 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Build frontend
-        working-directory: frontend
-        env:
-          VITE_RAZORPAY_KEY: ${{ secrets.VITE_RAZORPAY_KEY }}
-        run: npm run build
-
-      # -------------------------
-      # Docker build
-      # -------------------------
-
       - name: Build backend Docker image
         run: |
-          docker build --pull \
-            -t laptop-rental-backend:ci \
-            ./backend
-
-      - name: Build frontend Docker image
-        run: |
-          docker build --pull\
-            --build-arg VITE_RAZORPAY_KEY=${{ secrets.VITE_RAZORPAY_KEY }} \
-            -t laptop-rental-frontend:ci \
-            ./frontend
-
-      # -------------------------
-      # Security scan
-      # -------------------------
+          docker build --pull -t laptop-rental-backend:ci ./backend
 
       - name: Scan backend image
         uses: aquasecurity/trivy-action@master
@@ -77,6 +80,60 @@ jobs:
           ignore-unfixed: true
           severity: CRITICAL,HIGH
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag and push backend image
+        if: github.event_name == 'push'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag laptop-rental-backend:ci $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
+          docker tag laptop-rental-backend:ci $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
+
+    # -------------------------
+    # Frontend build
+    # -------------------------
+  frontend:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_RAZORPAY_KEY: ${{ secrets.VITE_RAZORPAY_KEY }}
+        run: npm run build
+
+      - name: Build frontend Docker image
+        run: |
+          docker build --pull \
+            --build-arg VITE_RAZORPAY_KEY=${{ secrets.VITE_RAZORPAY_KEY }} \
+            -t laptop-rental-frontend:ci \
+            ./frontend
+
       - name: Scan frontend image
         uses: aquasecurity/trivy-action@master
         with:
@@ -86,72 +143,23 @@ jobs:
           ignore-unfixed: true
           severity: CRITICAL,HIGH
 
-      # -------------------------
-      # AWS authentication
-      # -------------------------
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # -------------------------
-      # ECR login
-      # -------------------------
-
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # -------------------------
-      # Tag images
-      # -------------------------
-
-      - name: Tag Docker images
+      - name: Tag and push frontend image
+        if: github.event_name == 'push'
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker tag \
-            laptop-rental-backend:ci \
-            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
-
-          docker tag \
-            laptop-rental-backend:ci \
-            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
-
-          docker tag \
-            laptop-rental-frontend:ci \
-            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
-
-          docker tag \
-            laptop-rental-frontend:ci \
-            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
-
-      # -------------------------
-      # Push to ECR
-      # -------------------------
-
-      - name: Push backend image to ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker push \
-            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
-
-          docker push \
-            $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
-
-      - name: Push frontend image to ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker push \
-            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
-
-          docker push \
-            $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
-        
+          docker tag laptop-rental-frontend:ci $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
+          docker tag laptop-rental-frontend:ci $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
