@@ -1,0 +1,32 @@
+#-----Frontend-----#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laptop-rental-deployment-frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: laptop-rental-frontend
+          image: kirankumark17/laptop-rental:frontend
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 80

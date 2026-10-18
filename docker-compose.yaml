@@ -1,11 +1,12 @@
 services:
-  backend:
+  backend-service:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend
     environment:
       FRONT_END_URL: ${FRONT_END_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
       JWT_SECRET: ${JWT_SECRET}
       MONGO_URI: ${MONGO_URI}
@@ -13,31 +14,29 @@ services:
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}  
     ports:
-      - "5000:5000"
+      - "8000:8000"
     volumes:
       - ./backend/uploads:/app/uploads
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
     restart: unless-stopped
   
-  frontend:
+  frontend-service:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_RAZORPAY_KEY: ${VITE_RAZORPAY_KEY}
     container_name: frontend
     ports:
       - "3000:80"
 
     depends_on:
-      backend:
+      backend-service:
         condition: service_healthy
     networks:
       - app-network

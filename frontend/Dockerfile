@@ -11,12 +11,7 @@ RUN npm install -g npm@latest && npm ci
 
 COPY . .
 
-ARG VITE_BACKEND_ENDPOINT=/api
-ARG VITE_RAZORPAY_KEY
-
-ENV VITE_BACKEND_ENDPOINT=$VITE_BACKEND_ENDPOINT
-ENV VITE_RAZORPAY_KEY=$VITE_RAZORPAY_KEY
-
+ARG VITE_BACKEND_URL=""
 RUN npm run build
 
 
@@ -25,7 +20,8 @@ FROM nginx:alpine
 
 RUN apk update && apk upgrade --no-cache
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ARG NGINX_CONFIG=nginx.conf
+COPY ${NGINX_CONFIG} /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 

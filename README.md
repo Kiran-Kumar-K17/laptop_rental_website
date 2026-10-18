@@ -1,216 +1,274 @@
-# Laptop Rental Website 🖥️
+# Laptop Rental Website
 
-A full-stack rental marketplace built with **React** and **Node.js** that provides a seamless booking experience for laptop rentals. The platform features a complete booking lifecycle with KYC verification, automated inventory management, late fee calculations, and secure payment processing.
+Laptop Rental is a full-stack rental marketplace for browsing laptops, completing KYC verification, renting available devices, making Razorpay payments, and managing returns. Administrators can manage inventory, users, KYC submissions, rentals, payments, and reviews.
 
-## 🌟 Features
+## Features
 
-### Core Functionality
-- **Complete Booking Lifecycle**: Browse laptops, reserve, verify identity, and complete payment
-- **KYC Verification**: Secure identity verification process for all users
-- **Inventory Management**: Automated tracking of laptop availability and rental status
-- **Late Fee Calculation**: Smart system to calculate and manage late fees
-- **Secure Payments**: Integrated Razorpay payment gateway for safe transactions
+- Laptop catalog with availability checks
+- User registration, login, profile management, and password reset
+- KYC document upload and administrator approval
+- Rental creation, cancellation, return processing, and late-fee handling
+- Razorpay order creation, payment verification, payment history, and refunds
+- User and administrator review workflows
+- Persistent uploads for KYC documents and laptop images
+- Docker Compose and Kubernetes deployment manifests
 
-### User Features
-- **Laptop Browsing**: Filter and search through available laptops
-- **Booking Management**: View active, completed, and upcoming bookings
-- **User Dashboard**: Personal profile management and booking history
-- **Payment Integration**: Seamless checkout experience with Razorpay
+## Technology
 
-### Admin Features
-- **Inventory Management**: Add, update, and manage laptop listings
-- **User Management**: Monitor registered users and their KYC status
-- **Booking Analytics**: Track rental trends and revenue
-- **Late Fee Management**: Monitor and manage overdue rentals
+- **Frontend:** React 19, Vite, React Router, Axios
+- **Backend:** Node.js, Express 5, Mongoose
+- **Database:** MongoDB
+- **Payments:** Razorpay
+- **Production web server:** Nginx
+- **Containers:** Docker and Docker Compose
+- **Orchestration:** Kubernetes
 
-## 🛠️ Tech Stack
+## Prerequisites
 
-### Frontend
-- **React**: Modern UI framework for interactive components
-- **CSS**: Styling and responsive design
-- **JavaScript**: Client-side logic and API integration
+For local development, install:
 
-### Backend
-- **Node.js**: Server runtime environment
-- **Express.js**: Web application framework
-- **MongoDB**: NoSQL database for data storage
+- Node.js 22 or later (the Docker images use Node 22)
+- npm
+- MongoDB, either locally or through MongoDB Atlas
+- A Razorpay account and API keys
+- An SMTP-enabled email account if password-reset emails are required
 
-### Payment Integration
-- **Razorpay**: Secure payment gateway for transactions
+## Project Structure
 
-## 📋 Prerequisites
-
-Before you begin, ensure you have the following installed:
-- **Node.js** (v14 or higher)
-- **npm** or **yarn** package manager
-- **MongoDB** (local or MongoDB Atlas account)
-- **Razorpay Account** (for payment integration)
-
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/Kiran-Kumar-K17/laptop_rental_website.git
-cd laptop_rental_website
-```
-
-### 2. Backend Setup
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Install dependencies
-npm install
-
-# Create a .env file in the backend directory
-cat > .env << EOF
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-NODE_ENV=development
-EOF
-
-# Start the backend server
-npm start
-```
-
-### 3. Frontend Setup
-
-```bash
-# Navigate to frontend directory (from root)
-cd frontend
-
-# Install dependencies
-npm install
-
-# Create a .env file in the frontend directory
-cat > .env << EOF
-REACT_APP_API_URL=http://localhost:5000
-REACT_APP_RAZORPAY_KEY_ID=your_razorpay_key_id
-EOF
-
-# Start the development server
-npm start
-```
-
-The application will open at `http://localhost:3000`
-
-## 📁 Project Structure
-
-```
+```text
 laptop_rental_website/
-├── backend/
-│   ├── models/              # Database schemas
-│   ├── routes/              # API endpoints
-│   ├── controllers/         # Business logic
-│   ├── middleware/          # Authentication & validation
-│   ├── config/              # Configuration files
-│   ├── .env                 # Environment variables
-│   └── server.js            # Express server entry point
-├��─ frontend/
-│   ├── src/
-│   │   ├── components/      # Reusable React components
-│   │   ├── pages/           # Page components
-│   │   ├── services/        # API service calls
-│   │   ├── context/         # React Context for state
-│   │   ├── styles/          # CSS stylesheets
-│   │   └── App.js           # Main App component
-│   ├── public/              # Static assets
-│   └── .env                 # Environment variables
+├── backend/                 # Express API and MongoDB models
+│   ├── config/              # Database configuration
+│   ├── controllers/         # Request handlers
+│   ├── middleware/          # Auth, uploads, validation, and errors
+│   ├── models/              # Mongoose models
+│   ├── routes/              # API routes
+│   ├── uploads/             # Uploaded KYC and laptop files
+│   └── server.js            # API entry point
+├── frontend/                # React/Vite application
+├── manifest/                # Kubernetes Deployment and Service manifests
+├── docker-compose.yaml      # Containerized local/host deployment
 └── README.md
 ```
 
-## 🔑 Key APIs
+## Environment Variables
 
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
+Do not commit real credentials. The example files are [backend/env-example](./backend/env-example) and [frontend/env-example](./frontend/env-example).
 
-### Laptops
-- `GET /api/laptops` - Get all available laptops
-- `GET /api/laptops/:id` - Get laptop details
-- `POST /api/laptops` - Add new laptop (Admin)
-- `PUT /api/laptops/:id` - Update laptop details (Admin)
-- `DELETE /api/laptops/:id` - Delete laptop (Admin)
+### Backend
 
-### Bookings
-- `POST /api/bookings` - Create a new booking
-- `GET /api/bookings` - Get user's bookings
-- `GET /api/bookings/:id` - Get booking details
-- `PUT /api/bookings/:id` - Update booking status
-- `POST /api/bookings/:id/complete` - Complete booking and calculate fees
+Create `backend/.env` for local development:
 
-### KYC Verification
-- `POST /api/kyc` - Submit KYC documentation
-- `GET /api/kyc/:userId` - Get KYC status
-- `PUT /api/kyc/:id` - Update KYC status (Admin)
-
-### Payments
-- `POST /api/payments/create-order` - Create Razorpay order
-- `POST /api/payments/verify` - Verify payment
-
-## 🔐 Environment Variables
-
-### Backend (.env)
-```
-PORT=5000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/laptop_rental
-JWT_SECRET=your_super_secret_jwt_key
-RAZORPAY_KEY_ID=rzp_live_xxxxx
-RAZORPAY_KEY_SECRET=xxxx
-NODE_ENV=development
+```dotenv
+MONGO_URI=mongodb://127.0.0.1:27017/Laptop-Rental
+PORT=8000
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRES_IN=7d
+RAZORPAY_KEY_ID=your-razorpay-key-id
+RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+EMAIL_USER=your-smtp-email
+EMAIL_PASS=your-smtp-password-or-app-password
+FRONT_END_URL=http://localhost:5173
 ```
 
-### Frontend (.env)
+| Variable              | Required                      | Description                                |
+| --------------------- | ----------------------------- | ------------------------------------------ |
+| `MONGO_URI`           | Yes                           | MongoDB connection string.                 |
+| `PORT`                | No                            | API port; defaults to `8000`.              |
+| `JWT_SECRET`          | Yes                           | Secret used to sign authentication tokens. |
+| `JWT_EXPIRES_IN`      | Yes                           | Token lifetime, for example `7d` or `24h`. |
+| `RAZORPAY_KEY_ID`     | Yes for payments              | Razorpay public key ID.                    |
+| `RAZORPAY_KEY_SECRET` | Yes for payments              | Razorpay private key.                      |
+| `EMAIL_USER`          | Yes for password reset        | SMTP username/from address.                |
+| `EMAIL_PASS`          | Yes for password reset        | SMTP password or provider app password.    |
+| `FRONT_END_URL`       | Yes in deployed environments  | Allowed browser origin for CORS.           |
+| `FRONTEND_URL`        | Yes for password reset emails | URL included in reset-password links.      |
+
+The application currently uses `FRONT_END_URL` for CORS and `FRONTEND_URL` when constructing password-reset links. Set both to the same public frontend URL. In local development, the backend falls back to `http://localhost:5173` for CORS if `FRONT_END_URL` is omitted.
+
+### Frontend
+
+Create `frontend/.env` for local development:
+
+```dotenv
+VITE_BACKEND_URL=http://localhost:8000
 ```
-REACT_APP_API_URL=http://localhost:5000
-REACT_APP_RAZORPAY_KEY_ID=rzp_live_xxxxx
+
+`VITE_BACKEND_URL` is the backend origin without the `/api` suffix. The frontend adds `/api` itself. For the containerized deployment, leave this value empty when building the frontend image: Nginx proxies `/api` and `/uploads` to the `backend-service` container.
+
+## Local Development
+
+### Start the backend
+
+```bash
+cd backend
+npm install
+cp env-example .env
+# Edit .env and set the required values.
+npm run dev
 ```
 
-## 📖 Usage
+The API is available at `http://localhost:8000`. A health check is available at `http://localhost:8000/health`.
 
-### For Users
-1. **Sign Up**: Create an account with email and password
-2. **Complete KYC**: Upload required identity verification documents
-3. **Browse Laptops**: Explore available laptops with filters
-4. **Make Booking**: Select dates and confirm booking
-5. **Payment**: Complete payment through Razorpay
-6. **Manage Bookings**: Track your rental status and return laptops
+### Start the frontend
 
-### For Admins
-1. **Login**: Use admin credentials
-2. **Manage Inventory**: Add/update/delete laptop listings
-3. **Verify KYC**: Review and approve user KYC submissions
-4. **Monitor Bookings**: Track all rental activities
-5. **View Analytics**: Check revenue and rental statistics
+In a second terminal:
 
+```bash
+cd frontend
+npm install
+cp env-example .env
+npm run dev
+```
 
-## 🤝 Contributing
+The Vite development server is normally available at `http://localhost:5173`.
 
-Contributions are welcome! Please follow these steps:
+For a production-style frontend build:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+```bash
+cd frontend
+npm run build
+npm run preview
+```
 
-## 📝 License
+## Docker Compose
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+The [docker-compose.yaml](./docker-compose.yaml) builds the backend and frontend images. It does not run MongoDB, so provide a reachable MongoDB instance (MongoDB Atlas or a MongoDB server on the host/network).
 
-## 🙏 Acknowledgments
+Create a root `.env` file beside `docker-compose.yaml`:
 
-- Razorpay for payment processing
-- MongoDB for database services
-- React team for the amazing UI library
-- Node.js and Express.js communities
+```dotenv
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>/<database>
+PORT=8000
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRES_IN=7d
+RAZORPAY_KEY_ID=your-razorpay-key-id
+RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+EMAIL_USER=your-smtp-email
+EMAIL_PASS=your-smtp-password-or-app-password
+FRONT_END_URL=http://localhost:3000
+```
 
----
+Start the application:
 
-**Made with ❤️ by [Kiran Kumar K17](https://github.com/Kiran-Kumar-K17)**
+```bash
+docker compose up --build -d
+docker compose ps
+docker compose logs -f backend-service
+```
+
+Open `http://localhost:3000`. The frontend Nginx container proxies API requests to `backend-service:8000`. Uploaded files are persisted in the repository's `backend/uploads` directory through the Compose volume.
+
+Stop the application:
+
+```bash
+docker compose down
+```
+
+If the backend does not become healthy, check that `MONGO_URI` is reachable from the container and inspect `docker compose logs backend-service`.
+
+## Kubernetes
+
+The manifests in [manifest/](./manifest) create:
+
+- A backend Deployment and internal `backend-service` on port `8000`
+- A frontend Deployment and internal `frontend-service` on port `3000` (target port `80`)
+- An Nginx frontend that proxies `/api` and `/uploads` to `backend-service`
+
+The manifests reference these published images:
+
+```text
+kirankumark17/laptop-rental:backend
+kirankumark17/laptop-rental:frontend
+```
+
+Build and push equivalent images to a registry accessible by the cluster if those images are not already available:
+
+```bash
+docker build -t <registry>/laptop-rental:backend ./backend
+docker build -t <registry>/laptop-rental:frontend ./frontend
+docker push <registry>/laptop-rental:backend
+docker push <registry>/laptop-rental:frontend
+```
+
+Update the `image:` values in the manifests to match the pushed images.
+
+### Create the backend Secret
+
+The backend manifest expects a Kubernetes Secret named `env-secret`. Create it in the namespace where the application will run:
+
+```bash
+kubectl create secret generic env-secret \
+  --from-literal=MONGO_URI='mongodb+srv://<user>:<password>@<cluster>/<database>' \
+  --from-literal=PORT='8000' \
+  --from-literal=JWT_SECRET='replace-with-a-long-random-secret' \
+  --from-literal=JWT_EXPIRES_IN='7d' \
+  --from-literal=RAZORPAY_KEY_ID='your-razorpay-key-id' \
+  --from-literal=RAZORPAY_KEY_SECRET='your-razorpay-key-secret' \
+  --from-literal=EMAIL_USER='your-smtp-email' \
+  --from-literal=EMAIL_PASS='your-smtp-password-or-app-password' \
+  --from-literal=FRONT_END_URL='http://localhost:3000' \
+  --from-literal=FRONTEND_URL='http://localhost:3000'
+```
+
+For a real deployment, set `FRONT_END_URL` and `FRONTEND_URL` to the public frontend URL. Avoid storing the command containing real secrets in shell history or source control.
+
+### Deploy and verify
+
+```bash
+kubectl apply -f manifest/laptop_rental-backend.yaml
+kubectl apply -f manifest/laptop_rental-frontend.yaml
+
+kubectl get deployments,pods,services
+kubectl rollout status deployment/laptop-rental-deployment-backend
+kubectl rollout status deployment/laptop-rental-deployment-frontend
+```
+
+Both services are `ClusterIP`, so they are not directly exposed outside the cluster. For local verification, use port forwarding:
+
+```bash
+kubectl port-forward service/frontend-service 3000:3000
+```
+
+Then open `http://localhost:3000`. For a public deployment, expose `frontend-service` through an Ingress or change it to a suitable `LoadBalancer` service. Do not expose the backend service publicly unless required.
+
+> **Persistent storage:** The supplied Kubernetes manifests do not define a PersistentVolume for `backend/uploads`. Add a persistent volume claim and mount it at the backend container's uploads path before using Kubernetes in production, otherwise uploaded files can be lost when a pod is recreated.
+
+## API Overview
+
+All API routes are prefixed with `/api`.
+
+| Area     | Endpoints                                                                                                                                                      |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Users    | `POST /users/register`, `POST /users/login`, `GET/PATCH /users/profile`, `POST /users/upload-kyc`, `POST /users/forgot-password`, `POST /users/reset-password` |
+| Laptops  | `GET /laptops`, `GET /laptops/:id`, `GET /laptops/availability/:id`, admin CRUD at `/laptops`                                                                  |
+| Rentals  | `GET/POST /rentals`, `GET /rentals/:id`, `DELETE /rentals/:id`, admin return at `PUT /rentals/:id`                                                             |
+| Payments | `POST /payments/create-order`, `POST /payments/verify`, `GET /payments/my-history`, admin refunds at `/payments/refund/:rentalId`                              |
+| Reviews  | `POST /reviews`, `GET /reviews/laptop/:laptopId`, `GET /reviews/my-reviews`, `PUT /reviews/:id`, `DELETE /reviews/:id`                                         |
+
+The backend health endpoint is `/health` and is not under `/api`.
+
+## Useful Commands
+
+```bash
+# Backend production start
+cd backend && npm start
+
+# Frontend lint
+cd frontend && npm run lint
+
+# Build the frontend
+cd frontend && npm run build
+```
+
+## Security Notes
+
+- Keep `.env` files, API keys, JWT secrets, SMTP passwords, and Kubernetes Secrets out of Git.
+- Use separate Razorpay test keys and production keys.
+- Use HTTPS for deployed frontend and backend URLs.
+- Restrict MongoDB network access to trusted application hosts.
+- Configure persistent and backed-up storage for uploaded documents in production.
+
+## License
+
+This project is released under the license specified by the repository owner.

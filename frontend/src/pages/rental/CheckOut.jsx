@@ -76,7 +76,7 @@ const Checkout = () => {
       const order = await createOrder(rentalId);
 
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY,
+        key: order.keyId,
         amount: order.amount,
         currency: "INR",
         order_id: order.id,
