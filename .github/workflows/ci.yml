@@ -21,10 +21,6 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  AWS_REGION: ap-south-1
-  ECR_BACKEND_REPOSITORY: laptop-rental-backend
-  ECR_FRONTEND_REPOSITORY: laptop-rental-frontend
 
 jobs:
   changes:
@@ -79,29 +75,28 @@ jobs:
           exit-code: 1
           ignore-unfixed: true
           severity: CRITICAL,HIGH
-
-      - name: Configure AWS credentials
+      
+      - name: Login to Docker Hub
         if: github.event_name == 'push'
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: docker/login-action@v3
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        if: github.event_name == 'push'
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Tag and push backend image
         if: github.event_name == 'push'
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker tag laptop-rental-backend:ci $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
-          docker tag laptop-rental-backend:ci $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
+          docker tag laptop-rental-backend:ci \
+            $DOCKERHUB_USERNAME/laptop-rental-backend:$IMAGE_TAG
+
+          docker tag laptop-rental-backend:ci \
+            $DOCKERHUB_USERNAME/laptop-rental-backend:latest
+
+          docker push $DOCKERHUB_USERNAME/laptop-rental-backend:$IMAGE_TAG
+          docker push $DOCKERHUB_USERNAME/laptop-rental-backend:latest
 
     # -------------------------
     # Frontend build
@@ -145,25 +140,24 @@ jobs:
           ignore-unfixed: true
           severity: CRITICAL,HIGH
 
-      - name: Configure AWS credentials
+      - name: Login to Docker Hub
         if: github.event_name == 'push'
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: docker/login-action@v3
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        if: github.event_name == 'push'
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Tag and push frontend image
         if: github.event_name == 'push'
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker tag laptop-rental-frontend:ci $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
-          docker tag laptop-rental-frontend:ci $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
+          docker tag laptop-rental-frontend:ci \
+            $DOCKERHUB_USERNAME/laptop-rental-frontend:$IMAGE_TAG
+
+          docker tag laptop-rental-frontend:ci \
+            $DOCKERHUB_USERNAME/laptop-rental-frontend:latest
+
+          docker push $DOCKERHUB_USERNAME/laptop-rental-frontend:$IMAGE_TAG
+          docker push $DOCKERHUB_USERNAME/laptop-rental-frontend:latest
