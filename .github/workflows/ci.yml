@@ -89,14 +89,13 @@ jobs:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker tag laptop-rental-backend:ci \
-            $DOCKERHUB_USERNAME/laptop-rental-backend:$IMAGE_TAG
+          IMAGE=$DOCKERHUB_USERNAME/laptop-rental
 
-          docker tag laptop-rental-backend:ci \
-            $DOCKERHUB_USERNAME/laptop-rental-backend:latest
+          docker tag laptop-rental-backend:ci $IMAGE:backend-$IMAGE_TAG
+          docker tag laptop-rental-backend:ci $IMAGE:backend
 
-          docker push $DOCKERHUB_USERNAME/laptop-rental-backend:$IMAGE_TAG
-          docker push $DOCKERHUB_USERNAME/laptop-rental-backend:latest
+          docker push $IMAGE:backend-$IMAGE_TAG
+          docker push $IMAGE:backend
 
     # -------------------------
     # Frontend build
@@ -153,11 +152,10 @@ jobs:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker tag laptop-rental-frontend:ci \
-            $DOCKERHUB_USERNAME/laptop-rental-frontend:$IMAGE_TAG
+          IMAGE=$DOCKERHUB_USERNAME/laptop-rental
 
-          docker tag laptop-rental-frontend:ci \
-            $DOCKERHUB_USERNAME/laptop-rental-frontend:latest
+          docker tag laptop-rental-frontend:ci $IMAGE:frontend-$IMAGE_TAG
+          docker tag laptop-rental-frontend:ci $IMAGE:frontend
 
-          docker push $DOCKERHUB_USERNAME/laptop-rental-frontend:$IMAGE_TAG
-          docker push $DOCKERHUB_USERNAME/laptop-rental-frontend:latest
+          docker push $IMAGE:frontend-$IMAGE_TAG
+          docker push $IMAGE:frontend

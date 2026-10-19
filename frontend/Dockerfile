@@ -15,7 +15,7 @@ ARG VITE_BACKEND_URL=""
 RUN npm run build
 
 
-# Stage 2: Production
+# Stage 2: Production with Nginx
 FROM nginx:alpine
 
 RUN apk update && apk upgrade --no-cache
