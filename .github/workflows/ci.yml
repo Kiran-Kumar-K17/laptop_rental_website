@@ -50,6 +50,7 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
+    environment: laptop_rental_website
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -103,6 +104,7 @@ jobs:
   frontend:
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}
+    environment: laptop_rental_website
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
