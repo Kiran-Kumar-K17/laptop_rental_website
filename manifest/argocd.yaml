@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: laptop-rental-website
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Kiran-Kumar-K17/laptop_rental_website
+    targetRevision: main
+    path: manifest
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: laptop-rental-website
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
