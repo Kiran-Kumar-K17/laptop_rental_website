@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: laptop-rental-deployment-backend
+  namespace: laptop-rental-website
 spec:
   selector:
     matchLabels:
