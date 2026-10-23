@@ -9,7 +9,7 @@ COPY package*.json ./
 
 RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy only necessary folders/files
+# Copy only necessary folders and files
 COPY config/ ./config/
 COPY uploads/ ./uploads/
 COPY controllers/ ./controllers/
